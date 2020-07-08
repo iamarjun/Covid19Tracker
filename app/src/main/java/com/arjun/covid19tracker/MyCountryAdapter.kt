@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.arjun.covid19tracker.model.Country
-import kotlinx.android.synthetic.main.item_country.view.*
+import kotlinx.android.synthetic.main.item_my_country.view.*
 
 class MyCountryAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -32,7 +32,7 @@ class MyCountryAdapter(private val interaction: Interaction? = null) :
 
         return CountryListViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.item_country,
+                R.layout.item_my_country,
                 parent,
                 false
             ),
