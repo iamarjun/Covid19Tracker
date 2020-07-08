@@ -32,7 +32,7 @@ class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) :
 
                 val response = restApi.getCovidUpdate()
 
-                _countryList.value = Resource.Success(response.countries)
+                _countryList.value = Resource.Success(response.countries.sortedByDescending { it.totalConfirmed.toInt() })
                 _globalData.value = Resource.Success(response.global)
 
             } catch (e: Exception) {

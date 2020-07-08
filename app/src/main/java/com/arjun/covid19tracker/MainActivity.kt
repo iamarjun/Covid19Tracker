@@ -190,7 +190,11 @@ class MainActivity : AppCompatActivity() {
                             it.country.equals(countryName, ignoreCase = true)
                         }
                         myCountryAdapter.submitList(myCountry)
-                        countryListAdapter.submitList(countries)
+
+                        val filtered = countries.toMutableList()
+                        filtered.removeAll(myCountry)
+
+                        countryListAdapter.submitList(filtered)
                     }
                 }
                 is Resource.Error -> {
