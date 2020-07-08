@@ -5,29 +5,41 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arjun.covid19tracker.model.Covid
+import com.arjun.covid19tracker.model.Country
+import com.arjun.covid19tracker.model.Global
 import com.arjun.covid19tracker.model.Resource
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) : ViewModel() {
 
-    private val _covidData = MutableLiveData<Resource<Covid>>()
-    val covidData: LiveData<Resource<Covid>>
-        get() = _covidData
+    private val _countryList = MutableLiveData<Resource<List<Country>>>()
+    private val _globalData = MutableLiveData<Resource<Global>>()
+
+
+    val countryList: LiveData<Resource<List<Country>>>
+        get() = _countryList
+
+    val globalData: LiveData<Resource<Global>>
+        get() = _globalData
 
 
     fun getLatestCovidUpdates() {
         viewModelScope.launch {
             try {
+                _countryList.value = Resource.Loading(null)
+                _globalData.value = Resource.Loading(null)
 
-                _covidData.value = Resource.Loading(null)
                 val response = restApi.getCovidUpdate()
-                _covidData.value = Resource.Success(response)
+
+                _countryList.value = Resource.Success(response.countries)
+                _globalData.value = Resource.Success(response.global)
 
             } catch (e: Exception) {
 
-                println("fetch district stats failed ${e.message}")
-                _covidData.value = Resource.Error(e.localizedMessage)
+                Timber.d("fetch district stats failed ${e.message}")
+                _countryList.value = Resource.Error(e.localizedMessage)
+                _globalData.value = Resource.Error(e.localizedMessage)
 
             }
         }

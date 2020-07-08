@@ -37,7 +37,6 @@
                 android:fontFamily="@font/pt_sans_bold"
                 android:text="@string/label_confirmed"
                 android:textColor="@color/red"
-                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -46,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/red"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="2022" />
 
@@ -86,7 +85,6 @@
                 android:fontFamily="@font/pt_sans_bold"
                 android:text="@string/label_recovered"
                 android:textColor="@color/green"
-                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -95,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/green"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="2022" />
 
@@ -134,7 +132,6 @@
                 android:fontFamily="@font/pt_sans_bold"
                 android:text="@string/label_deceased"
                 android:textColor="@color/gray"
-                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -143,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/gray"
-                android:textSize="24sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="2022" />
 

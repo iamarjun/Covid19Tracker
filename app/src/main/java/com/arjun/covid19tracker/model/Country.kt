@@ -13,19 +13,19 @@ data class Country(
     @Json(name = "Date")
     val date: String = "",
     @Json(name = "NewConfirmed")
-    val newConfirmed: Int = 0,
+    val newConfirmed: String = "",
     @Json(name = "NewDeaths")
-    val newDeaths: Int = 0,
+    val newDeaths: String = "",
     @Json(name = "NewRecovered")
-    val newRecovered: Int = 0,
+    val newRecovered: String = "",
     @Json(name = "Premium")
     val premium: Premium = Premium(),
     @Json(name = "Slug")
     val slug: String = "",
     @Json(name = "TotalConfirmed")
-    val totalConfirmed: Int = 0,
+    val totalConfirmed: String = "",
     @Json(name = "TotalDeaths")
-    val totalDeaths: Int = 0,
+    val totalDeaths: String = "",
     @Json(name = "TotalRecovered")
-    val totalRecovered: Int = 0
+    val totalRecovered: String = ""
 )
