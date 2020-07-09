@@ -6,4 +6,12 @@
     <string name="label_recovered">RECOVERED</string>
     <string name="label_deceased">DEATHS</string>
     <string name="country">COUNTRY</string>
+    <string name="filter">Filter</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string-array name="filters">
+        <item>None</item>
+        <item><![CDATA[>=]]></item>
+        <item><![CDATA[<=]]></item>
+    </string-array>
 </resources>

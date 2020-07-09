@@ -8,9 +8,10 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.*
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -19,7 +20,16 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.DialogBehavior
+import com.afollestad.materialdialogs.LayoutMode
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.ModalDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.arjun.covid19tracker.databinding.ActivityMainBinding
+import com.arjun.covid19tracker.model.Filters
 import com.arjun.covid19tracker.model.Global
 import com.arjun.covid19tracker.model.Resource
 import com.arjun.covid19tracker.util.GpsUtils
@@ -31,6 +41,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.filter_view.view.*
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
@@ -70,6 +81,10 @@ class MainActivity : AppCompatActivity() {
     private var recoveredDesc = false
     private var deathsDesc = false
 
+    private val totalFilters: Filters.Total by lazy { Filters.Total() }
+    private val recoveredFilters: Filters.Recovered by lazy { Filters.Recovered() }
+    private val deathFilters: Filters.Deaths by lazy { Filters.Deaths() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -106,9 +121,265 @@ class MainActivity : AppCompatActivity() {
             adapter = concatAdapter
         }
 
+        isContinue = false
+        getLocation()
+
+        viewModel.globalData.observe(this) {
+            when (it) {
+
+                is Resource.Loading -> {
+                    Timber.d(it.message)
+                    loader.visibility(true)
+
+                }
+                is Resource.Success -> {
+                    Timber.d(it.data.toString())
+                    loader.visibility(false)
+                    it.data?.let { globalData ->
+                        setGlobalData(globalData)
+                    }
+                }
+                is Resource.Error -> {
+                    Timber.d(it.message)
+                    loader.visibility(false)
+                }
+            }
+        }
+
+        viewModel.countryList.observe(this) {
+            when (it) {
+
+                is Resource.Loading -> {
+                    Timber.d(it.message)
+                    loader.visibility(true)
+
+                }
+                is Resource.Success -> {
+                    Timber.d(it.data.toString())
+                    loader.visibility(false)
+                    it.data?.let { countries ->
+
+                        val myCountry = countries.filter {
+                            it.country.equals(countryName, ignoreCase = true)
+                        }
+                        myCountryAdapter.submitList(myCountry)
+
+                        val filtered = countries.toMutableList()
+                        filtered.removeAll(myCountry)
+
+                        countryListAdapter.submitList(filtered)
+                    }
+                }
+                is Resource.Error -> {
+                    Timber.d(it.message)
+                    loader.visibility(false)
+                }
+            }
+        }
+
         setPerColumnSort()
+
     }
 
+    private fun showCustomViewDialog(dialogBehavior: DialogBehavior = ModalDialog) {
+        val dialog = MaterialDialog(this, dialogBehavior).show {
+            title(R.string.filter)
+            customView(R.layout.filter_view, scrollable = true, horizontalPadding = true)
+            positiveButton(R.string.apply) { dialog ->
+                handleBottomSheetTextFields(dialog.getCustomView())
+                filterList()
+            }
+            negativeButton(R.string.reset) {
+                val list = viewModel.originalCountryList.value ?: listOf()
+                countryListAdapter.submitList(list)
+                resetFilters()
+            }
+            lifecycleOwner(this@MainActivity)
+            debugMode(false)
+        }
+
+        // Setup custom view content
+
+        val customView = dialog.getCustomView()
+
+        handleBottomSheetSpinners(customView)
+    }
+
+    private fun resetFilters() {
+        totalFilters.apply {
+            value = ""
+            condition = 0
+        }
+
+        recoveredFilters.apply {
+            value = ""
+            condition = 0
+        }
+
+        deathFilters.apply {
+            value = ""
+            condition = 0
+        }
+    }
+
+    private fun filterList() {
+        Timber.d("Total Filter ${totalFilters.condition} ${totalFilters.value}")
+        Timber.d("Recovered Filter ${recoveredFilters.condition} ${recoveredFilters.value}")
+        Timber.d("Death Filter ${deathFilters.condition} ${deathFilters.value}")
+
+        val list = countryListAdapter.getList
+
+        var filteredList = list.filter { country ->
+            when (totalFilters.condition) {
+                1 -> {
+                    country.totalConfirmed.toInt() >= totalFilters.value.toInt()
+                }
+                2 -> {
+                    country.totalConfirmed.toInt() <= totalFilters.value.toInt()
+                }
+                else -> {
+                    country.totalConfirmed.toInt() > 0
+                }
+            }
+        }
+
+        filteredList = filteredList.filter { country ->
+            when (recoveredFilters.condition) {
+                1 -> {
+                    country.totalRecovered.toInt() >= recoveredFilters.value.toInt()
+                }
+                2 -> {
+                    country.totalRecovered.toInt() <= recoveredFilters.value.toInt()
+                }
+                else -> {
+                    country.totalRecovered.toInt() > 0
+                }
+            }
+        }
+
+        filteredList = filteredList.filter { country ->
+            when (deathFilters.condition) {
+                1 -> {
+                    country.totalDeaths.toInt() >= deathFilters.value.toInt()
+                }
+                2 -> {
+                    country.totalDeaths.toInt() <= deathFilters.value.toInt()
+                }
+                else -> {
+                    country.totalDeaths.toInt() > 0
+                }
+            }
+        }
+
+        countryListAdapter.submitList(filteredList)
+    }
+
+    private fun handleBottomSheetTextFields(customView: View) {
+        val totalValue = customView.total_text
+        val recoveredValue = customView.recovered_text
+        val deathValue = customView.deaths_text
+
+        deathFilters.value = deathValue.text.toString()
+        recoveredFilters.value = recoveredValue.text.toString()
+        totalFilters.value = totalValue.text.toString()
+    }
+
+    private fun handleBottomSheetSpinners(customView: View) {
+
+        val totalSpinner = customView.total_spinner
+        val recoveredSpinner = customView.recovered_spinner
+        val deathSpinner = customView.deaths_spinner
+        val totalValue = customView.total_text
+        val recoveredValue = customView.recovered_text
+        val deathValue = customView.deaths_text
+
+        totalValue.setText(totalFilters.value)
+        recoveredValue.setText(recoveredFilters.value)
+        deathValue.setText(deathFilters.value)
+
+        totalSpinner.apply {
+            val mAdapter = ArrayAdapter.createFromResource(
+                this@MainActivity,
+                R.array.filters,
+                android.R.layout.simple_spinner_item
+            )
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapter = mAdapter
+        }
+
+        totalSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                totalFilters.condition = position
+            }
+        }
+
+        totalSpinner.setSelection(totalFilters.condition)
+
+        recoveredSpinner.apply {
+            val mAdapter = ArrayAdapter.createFromResource(
+                this@MainActivity,
+                R.array.filters,
+                android.R.layout.simple_spinner_item
+            )
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapter = mAdapter
+        }
+
+        recoveredSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                recoveredFilters.condition = position
+            }
+
+        }
+
+        recoveredSpinner.setSelection(recoveredFilters.condition)
+
+        deathSpinner.apply {
+            val mAdapter = ArrayAdapter.createFromResource(
+                this@MainActivity,
+                R.array.filters,
+                android.R.layout.simple_spinner_item
+            )
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapter = mAdapter
+        }
+
+        deathSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                deathFilters.condition = position
+            }
+        }
+
+        deathSpinner.setSelection(deathFilters.condition)
+
+    }
 
     private fun setPerColumnSort() {
 
@@ -195,67 +466,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        isContinue = false
-        getLocation()
-
-        viewModel.globalData.observe(this) {
-            when (it) {
-
-                is Resource.Loading -> {
-                    Timber.d(it.message)
-                    loader.visibility(true)
-
-                }
-                is Resource.Success -> {
-                    Timber.d(it.data.toString())
-                    loader.visibility(false)
-                    it.data?.let { globalData ->
-                        setGlobalData(globalData)
-                    }
-                }
-                is Resource.Error -> {
-                    Timber.d(it.message)
-                    loader.visibility(false)
-                }
-            }
-        }
-
-        viewModel.countryList.observe(this) {
-            when (it) {
-
-                is Resource.Loading -> {
-                    Timber.d(it.message)
-                    loader.visibility(true)
-
-                }
-                is Resource.Success -> {
-                    Timber.d(it.data.toString())
-                    loader.visibility(false)
-                    it.data?.let { countries ->
-
-                        val myCountry = countries.filter {
-                            it.country.equals(countryName, ignoreCase = true)
-                        }
-                        myCountryAdapter.submitList(myCountry)
-
-                        val filtered = countries.toMutableList()
-                        filtered.removeAll(myCountry)
-
-                        countryListAdapter.submitList(filtered)
-                    }
-                }
-                is Resource.Error -> {
-                    Timber.d(it.message)
-                    loader.visibility(false)
-                }
-            }
-        }
-    }
-
-
     @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -300,6 +510,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_filter, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == R.id.filter) {
+            showCustomViewDialog(BottomSheet(LayoutMode.WRAP_CONTENT))
+            true
+        } else
+            super.onOptionsItemSelected(item)
+    }
+
     private fun setGlobalData(globalData: Global) {
         confirmedValue.text = globalData.totalConfirmed.toString()
         recoveredValue.text = globalData.totalRecovered.toString()
@@ -321,11 +547,5 @@ class MainActivity : AppCompatActivity() {
 
         return null
     }
-
-    companion object {
-
-
-    }
-
 
 }

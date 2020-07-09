@@ -14,6 +14,7 @@ import timber.log.Timber
 class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) : ViewModel() {
 
     private val _countryList = MutableLiveData<Resource<List<Country>>>()
+    private val _originalCountryList = MutableLiveData<List<Country>>()
     private val _globalData = MutableLiveData<Resource<Global>>()
 
 
@@ -22,6 +23,9 @@ class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) :
 
     val globalData: LiveData<Resource<Global>>
         get() = _globalData
+
+    val originalCountryList: LiveData<List<Country>>
+        get() = _originalCountryList
 
 
     fun getLatestCovidUpdates() {
@@ -32,7 +36,9 @@ class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) :
 
                 val response = restApi.getCovidUpdate()
 
-                _countryList.value = Resource.Success(response.countries.sortedByDescending { it.totalConfirmed.toInt() })
+                _countryList.value =
+                    Resource.Success(response.countries.sortedByDescending { it.totalConfirmed.toInt() })
+                _originalCountryList.value = response.countries.sortedByDescending { it.totalConfirmed.toInt() }
                 _globalData.value = Resource.Success(response.global)
 
             } catch (e: Exception) {
