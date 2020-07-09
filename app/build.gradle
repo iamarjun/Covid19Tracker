@@ -35,8 +35,8 @@ android {
         freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
     }
 
-    viewBinding {
-        enabled = true
+    buildFeatures{
+         viewBinding = true
     }
 }
 
