@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var total: TextView
     private lateinit var deaths: TextView
     private lateinit var recovered: TextView
+    private lateinit var appliedFilters: TextView
     private lateinit var loader: ProgressBar
     private lateinit var countryList: RecyclerView
 
@@ -80,6 +81,8 @@ class MainActivity : AppCompatActivity() {
     private var totalDesc = true
     private var recoveredDesc = false
     private var deathsDesc = false
+
+    private val filterText: StringBuilder by lazy { StringBuilder() }
 
     private val totalFilters: Filters.Total by lazy { Filters.Total() }
     private val recoveredFilters: Filters.Recovered by lazy { Filters.Recovered() }
@@ -113,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         recovered = binding.recovered
         loader = binding.loader
         countryList = binding.countryList
+        appliedFilters = binding.appliedFilters
 
         val concatAdapter = ConcatAdapter(myCountryAdapter, countryListAdapter)
 
@@ -188,11 +192,13 @@ class MainActivity : AppCompatActivity() {
             positiveButton(R.string.apply) { dialog ->
                 handleBottomSheetTextFields(dialog.getCustomView())
                 filterList()
+                appliedFilters.text = filterText.toString()
             }
             negativeButton(R.string.reset) {
                 val list = viewModel.originalCountryList.value ?: listOf()
                 countryListAdapter.submitList(list)
                 resetFilters()
+                appliedFilters.text = filterText.toString()
             }
             lifecycleOwner(this@MainActivity)
             debugMode(false)
@@ -206,6 +212,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetFilters() {
+        filterText.clear()
+
         totalFilters.apply {
             value = ""
             condition = 0
@@ -228,6 +236,9 @@ class MainActivity : AppCompatActivity() {
         Timber.d("Death Filter ${deathFilters.condition} ${deathFilters.value}")
 
         val list = countryListAdapter.getList
+
+        filterText.clear()
+        filterText.append("Filtered by ")
 
         var filteredList = list.filter { country ->
             when (totalFilters.condition) {
@@ -269,6 +280,24 @@ class MainActivity : AppCompatActivity() {
                     country.totalDeaths.toInt() > 0
                 }
             }
+        }
+
+        when (totalFilters.condition) {
+            1 -> filterText.append("Total Cases >=").append(totalFilters.value).appendln()
+            2 -> filterText.append("Total Cases <=").append(totalFilters.value).appendln()
+            else -> filterText.clear()
+        }
+
+        when (recoveredFilters.condition) {
+            1 -> filterText.append("Recovered Cases >=").append(recoveredFilters.value).appendln()
+            2 -> filterText.append("Recovered Cases <=").append(recoveredFilters.value).appendln()
+            else -> filterText.clear()
+        }
+
+        when (deathFilters.condition) {
+            1 -> filterText.append("Death Cases >=").append(deathFilters.value).appendln()
+            2 -> filterText.append("Death Cases <=").append(deathFilters.value).appendln()
+            else -> filterText.clear()
         }
 
         countryListAdapter.submitList(filteredList)
