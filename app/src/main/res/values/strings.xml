@@ -5,6 +5,5 @@
     <string name="label_confirmed">TOTAL</string>
     <string name="label_recovered">RECOVERED</string>
     <string name="label_deceased">DEATHS</string>
-    <string name="label_loading">Loading</string>
-    <string name="title_precaution">Precaution</string>
+    <string name="country">COUNTRY</string>
 </resources>

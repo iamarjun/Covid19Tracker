@@ -148,6 +148,86 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:weightSum="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_recovered">
+
+        <TextView
+            android:id="@+id/country"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:padding="8dp"
+            android:text="@string/country"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:background="?selectableItemBackground"
+            android:drawableEnd="@drawable/ic_up"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/label_confirmed"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/deaths"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:background="?selectableItemBackground"
+            android:drawableEnd="@drawable/ic_up"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/label_recovered"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/recovered"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:background="?selectableItemBackground"
+            android:drawableEnd="@drawable/ic_up"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/label_deceased"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/loader"
         android:layout_width="wrap_content"
@@ -161,10 +241,9 @@
         android:id="@+id/country_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_recovered" />
+        app:layout_constraintTop_toBottomOf="@id/header" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

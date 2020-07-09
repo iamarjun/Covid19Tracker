@@ -20,10 +20,10 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arjun.covid19tracker.databinding.ActivityMainBinding
-import com.arjun.covid19tracker.model.Country
 import com.arjun.covid19tracker.model.Global
 import com.arjun.covid19tracker.model.Resource
 import com.arjun.covid19tracker.util.GpsUtils
+import com.arjun.covid19tracker.util.drawableEnd
 import com.arjun.covid19tracker.util.showToast
 import com.arjun.covid19tracker.util.viewbinding.viewBinding
 import com.arjun.covid19tracker.util.visibility
@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var confirmedValue: TextView
     private lateinit var recoveredValue: TextView
     private lateinit var deceasedValue: TextView
+    private lateinit var total: TextView
+    private lateinit var deaths: TextView
+    private lateinit var recovered: TextView
     private lateinit var loader: ProgressBar
     private lateinit var countryList: RecyclerView
 
@@ -56,13 +59,16 @@ class MainActivity : AppCompatActivity() {
     private var isGPS = false
 
     private val countryListAdapter by lazy { CountryListAdapter() }
-    private val headerAdapter by lazy { HeaderAdapter() }
     private val myCountryAdapter by lazy { MyCountryAdapter() }
 
     private var wayLatitude = 0.0
     private var wayLongitude = 0.0
 
     private var countryName: String? = null
+
+    private var totalDesc = true
+    private var recoveredDesc = false
+    private var deathsDesc = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,15 +93,68 @@ class MainActivity : AppCompatActivity() {
         confirmedValue = binding.textConfirmedValue
         recoveredValue = binding.textRecoveredValue
         deceasedValue = binding.textDeceasedValue
+        total = binding.total
+        deaths = binding.deaths
+        recovered = binding.recovered
         loader = binding.loader
         countryList = binding.countryList
 
-        val concatAdapter = ConcatAdapter(headerAdapter, myCountryAdapter, countryListAdapter)
+        val concatAdapter = ConcatAdapter(myCountryAdapter, countryListAdapter)
 
         countryList.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = concatAdapter
         }
+
+        setPerColumnSort()
+    }
+
+
+    private fun setPerColumnSort() {
+
+        total.setOnClickListener {
+            val list = countryListAdapter.getList
+
+            if (totalDesc) {
+                totalDesc = false
+                total.drawableEnd(R.drawable.ic_down)
+                countryListAdapter.submitList(list.sortedBy { it.totalConfirmed.toInt() })
+            } else {
+                totalDesc = true
+                total.drawableEnd(R.drawable.ic_up)
+                countryListAdapter.submitList(list.sortedByDescending { it.totalConfirmed.toInt() })
+            }
+        }
+
+        recovered.setOnClickListener {
+            val list = countryListAdapter.getList
+
+            if (recoveredDesc) {
+                recoveredDesc = false
+                recovered.drawableEnd(R.drawable.ic_down)
+                countryListAdapter.submitList(list.sortedBy { it.totalRecovered.toInt() })
+            } else {
+                recoveredDesc = true
+                recovered.drawableEnd(R.drawable.ic_up)
+                countryListAdapter.submitList(list.sortedByDescending { it.totalRecovered.toInt() })
+            }
+        }
+
+
+        deaths.setOnClickListener {
+            val list = countryListAdapter.getList
+
+            if (deathsDesc) {
+                deathsDesc = false
+                deaths.drawableEnd(R.drawable.ic_down)
+                countryListAdapter.submitList(list.sortedBy { it.totalDeaths.toInt() })
+            } else {
+                deathsDesc = true
+                deaths.drawableEnd(R.drawable.ic_up)
+                countryListAdapter.submitList(list.sortedByDescending { it.totalDeaths.toInt() })
+            }
+        }
+
     }
 
     private fun getLocation() {
@@ -176,16 +235,7 @@ class MainActivity : AppCompatActivity() {
                     Timber.d(it.data.toString())
                     loader.visibility(false)
                     it.data?.let { countries ->
-                        headerAdapter.submitList(
-                            listOf(
-                                Country(
-                                    country = "COUNTRY",
-                                    totalConfirmed = "TOTAL CASES",
-                                    totalDeaths = "RECOVERED",
-                                    totalRecovered = "DEATHS"
-                                )
-                            )
-                        )
+
                         val myCountry = countries.filter {
                             it.country.equals(countryName, ignoreCase = true)
                         }

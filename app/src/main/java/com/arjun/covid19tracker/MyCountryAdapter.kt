@@ -70,9 +70,6 @@ class MyCountryAdapter(private val interaction: Interaction? = null) :
         val recovered = itemView.recovered
 
         fun bind(item: Country) {
-            itemView.setOnClickListener {
-                interaction?.onItemSelected(adapterPosition, item)
-            }
 
             country.text = item.country
             total.text = item.totalConfirmed.toString()
@@ -80,7 +77,7 @@ class MyCountryAdapter(private val interaction: Interaction? = null) :
             recovered.text = item.totalRecovered.toString()
 
             // Alternating row colors
-            if ((adapterPosition + 1) % 2 == 0) {
+            if ((bindingAdapterPosition + 1) % 2 == 0) {
                 card.setBackgroundColor(
                     ContextCompat.getColor(
                         card.context,

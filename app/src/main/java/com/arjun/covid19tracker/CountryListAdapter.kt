@@ -56,6 +56,9 @@ class CountryListAdapter(private val interaction: Interaction? = null) :
         differ.submitList(list)
     }
 
+    val getList: List<Country>
+        get() = differ.currentList
+
     class CountryListViewHolder
     constructor(
         itemView: View,
@@ -71,7 +74,7 @@ class CountryListAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Country) {
             itemView.setOnClickListener {
-                interaction?.onItemSelected(adapterPosition, item)
+                interaction?.onItemSelected(bindingAdapterPosition, item)
             }
 
             country.text = item.country
@@ -80,7 +83,7 @@ class CountryListAdapter(private val interaction: Interaction? = null) :
             recovered.text = item.totalRecovered.toString()
 
             // Alternating row colors
-            if ((adapterPosition + 1) % 2 == 0) {
+            if ((bindingAdapterPosition + 1) % 2 == 0) {
                 card.setBackgroundColor(
                     ContextCompat.getColor(
                         card.context,

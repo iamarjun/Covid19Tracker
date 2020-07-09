@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arjun.covid19tracker.model.Country
 import kotlinx.android.synthetic.main.item_header.view.*
 
-class HeaderAdapter(private val interaction: Interaction? = null) :
+class HeaderAdapter(private val interaction: SortInteraction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Country>() {
@@ -59,25 +59,26 @@ class HeaderAdapter(private val interaction: Interaction? = null) :
     class CountryListViewHolder
     constructor(
         itemView: View,
-        private val interaction: Interaction?
+        private val interaction: SortInteraction?
     ) : RecyclerView.ViewHolder(itemView) {
 
-        val card = itemView.card_state
+        private val card = itemView.card_state
 
-        val country = itemView.country
-        val total = itemView.total
-        val deaths = itemView.deaths
-        val recovered = itemView.recovered
+        private val country = itemView.country
+        private val total = itemView.total
+        private val deaths = itemView.deaths
+        private val recovered = itemView.recovered
 
         fun bind(item: Country) {
-            itemView.setOnClickListener {
-                interaction?.onItemSelected(bindingAdapterPosition, item)
-            }
 
             country.text = item.country
-            total.text = item.totalConfirmed.toString()
-            deaths.text = item.totalDeaths.toString()
-            recovered.text = item.totalRecovered.toString()
+            total.text = item.totalConfirmed
+            deaths.text = item.totalDeaths
+            recovered.text = item.totalRecovered
+
+            total.setOnClickListener { interaction?.sortByTotalCases() }
+            deaths.setOnClickListener { interaction?.sortByDeaths() }
+            recovered.setOnClickListener { interaction?.sortByRecovered() }
 
             // Alternating row colors
             if ((bindingAdapterPosition + 1) % 2 == 0) {
@@ -114,8 +115,10 @@ class HeaderAdapter(private val interaction: Interaction? = null) :
         }
     }
 
-    interface Interaction {
-        fun onItemSelected(position: Int, item: Country)
+    interface SortInteraction {
+        fun sortByTotalCases()
+        fun sortByRecovered()
+        fun sortByDeaths()
     }
 }
 
