@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var deaths: TextView
     private lateinit var recovered: TextView
     private lateinit var appliedFilters: TextView
+    private lateinit var lastUpdated: TextView
     private lateinit var loader: ProgressBar
     private lateinit var countryList: RecyclerView
 
@@ -117,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         loader = binding.loader
         countryList = binding.countryList
         appliedFilters = binding.appliedFilters
+        lastUpdated = binding.lastUpdated
 
         val concatAdapter = ConcatAdapter(myCountryAdapter, countryListAdapter)
 
@@ -177,8 +179,13 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Error -> {
                     Timber.d(it.message)
                     loader.visibility(false)
+                    showToast(it.message ?: "Something went wrong")
                 }
             }
+        }
+
+        viewModel.lastUpdatedTime.observe(this) {
+            lastUpdated.text = "Last Updated: $it"
         }
 
         setPerColumnSort()

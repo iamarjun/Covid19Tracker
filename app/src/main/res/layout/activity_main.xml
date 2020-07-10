@@ -149,6 +149,16 @@
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
+        android:id="@+id/last_updated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toTopOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_death"
+        tools:text="@string/label_last_updated" />
+
+    <TextView
         android:id="@+id/applied_filters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
