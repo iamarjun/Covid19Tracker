@@ -11,8 +11,8 @@ import com.arjun.covid19tracker.model.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) : ViewModel() {
 
@@ -57,7 +57,7 @@ class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) :
                 response.countries.sortedByDescending { it.totalConfirmed.toInt() }
             _globalData.value = Resource.Success(response.global)
 
-            _lastUpdatedTime.value = getLastUpdatedDate(System.currentTimeMillis())
+            _lastUpdatedTime.value = getLastUpdatedDate()
 
         } catch (e: Exception) {
 
@@ -67,10 +67,10 @@ class MainViewModel @ViewModelInject constructor(private val restApi: RestApi) :
         }
     }
 
-    private fun getLastUpdatedDate(currentTime: Long ): String {
-        val sdf = SimpleDateFormat("MMM dd,yyyy HH:mm", Locale.getDefault())
-        val lastUpdatedDate = Date(currentTime)
-        return sdf.format(lastUpdatedDate)
+    private fun getLastUpdatedDate(): String {
+        val formatter = DateTimeFormatter.ofPattern("MMM dd,yyyy HH:mm")
+        val now: LocalDateTime = LocalDateTime.now()
+        return now.format(formatter)
     }
 
     companion object {

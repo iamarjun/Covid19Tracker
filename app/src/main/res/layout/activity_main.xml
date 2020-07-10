@@ -153,7 +153,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:fontFamily="sans-serif-condensed"
         app:layout_constraintBottom_toTopOf="@id/header"
+        app:layout_constraintEnd_toStartOf="@+id/applied_filters"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/card_death"
         tools:text="@string/label_last_updated" />
@@ -163,8 +167,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif-condensed"
         app:layout_constraintBottom_toTopOf="@id/header"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/last_updated"
         app:layout_constraintTop_toBottomOf="@id/card_death"
         tools:text="@string/filter" />
 
