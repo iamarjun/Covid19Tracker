@@ -3,6 +3,5 @@ A Covid-19 tracker app which shows stats according to your current location, aut
 
 ## Screenshots
 <img src="https://github.com/iamarjun/Covid19Tracker/blob/master/screenshots/Screenshot_20200904-124641.png" width="300" >
-
-
-<img src="https://github.com/iamarjun/Covid19Tracker/blob/master/screenshots/Screenshot_20200904-124641.png?raw=true" width="300" >
+<img src="https://github.com/iamarjun/Covid19Tracker/blob/master/screenshots/Screenshot_20200904-125730.png" width="300" >
+<img src="https://github.com/iamarjun/Covid19Tracker/blob/master/screenshots/Screenshot_20200904-124719.png" width="300" >
